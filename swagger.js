@@ -44,6 +44,9 @@ module.exports = () => {
   const filePath = path.join(process.cwd(), "src/routes/orderRoutes.js");
   if (fs.existsSync(filePath)) {
     console.log("[Swagger] orderRoutes.js exists at:", filePath);
+    // Read first 200 chars to verify content
+    const content = fs.readFileSync(filePath, 'utf8').substring(0, 200);
+    console.log("[Swagger] File starts with:", content.replace(/\n/g, '\\n'));
   } else {
     console.log("[Swagger] ⚠️ orderRoutes.js does NOT exist at:", filePath);
   }
