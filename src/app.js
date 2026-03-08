@@ -13,11 +13,10 @@ app.use(express.json());
 app.use("/orders", routes);
 
 // Generate Swagger spec dynamically after env loads
+console.log("[App] process.env.BASE_URL:", process.env.BASE_URL);
+console.log("[App] process.env.PORT:", process.env.PORT);
+
 const swaggerSpec = swaggerSpecFactory();
-const BASE_URL = process.env.BASE_URL || `http://localhost:${process.env.PORT || 5000}`;
-console.log("✓ Swagger spec generated");
-console.log("  BASE_URL:", BASE_URL);
-console.log("  Found routes");
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
