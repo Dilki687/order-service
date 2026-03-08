@@ -7,15 +7,16 @@ const options = {
     info: {
       title: "Order Service API",
       version: "1.0.0",
-      description: "Order Microservice API"
+      description: "Order Microservice API",
     },
     servers: [
       {
-        url: process.env.BASE_URL || "http://localhost:5000"
-      }
-    ]
+        url: process.env.BASE_URL || `http://localhost:${process.env.PORT || 5000}`,
+      },
+    ],
   },
-  apis: [path.join(__dirname, "src/routes/*.js")]
+  // Use relative path from current working directory, not __dirname
+  apis: [path.join(process.cwd(), "src/routes/*.js")],
 };
 
 module.exports = swaggerJsdoc(options);
