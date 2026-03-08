@@ -4,12 +4,14 @@ const fs = require("fs");
 
 // Factory function to generate spec dynamically
 module.exports = () => {
-  const apisPath = path.join(__dirname, "src/routes/*.js");
-  const routesDir = path.join(__dirname, "src/routes");
+  const apisPath = path.join(process.cwd(), "src/routes/*.js");
+  const routesDir = path.join(process.cwd(), "src/routes");
   
   // Debug logging
+  console.log("[Swagger] process.cwd():", process.cwd());
   console.log("[Swagger] __dirname:", __dirname);
   console.log("[Swagger] Scanning for routes in:", routesDir);
+  console.log("[Swagger] apis path:", apisPath);
   
   if (fs.existsSync(routesDir)) {
     const files = fs.readdirSync(routesDir);
@@ -32,12 +34,25 @@ module.exports = () => {
         },
       ],
     },
-    // Use __dirname for reliable path resolution (works on Railway too)
-    apis: [apisPath],
+    // Use specific file path instead of glob
+    apis: [path.join(process.cwd(), "src/routes/orderRoutes.js")],
   };
+  
+  console.log("[Swagger] Options apis:", options.apis);
+  
+  // Check if file exists
+  const filePath = path.join(process.cwd(), "src/routes/orderRoutes.js");
+  if (fs.existsSync(filePath)) {
+    console.log("[Swagger] orderRoutes.js exists at:", filePath);
+  } else {
+    console.log("[Swagger] ⚠️ orderRoutes.js does NOT exist at:", filePath);
+  }
   
   const spec = swaggerJsdoc(options);
   console.log("[Swagger] Spec paths generated:", Object.keys(spec.paths || {}).length, "endpoints");
+  if (spec.paths) {
+    console.log("[Swagger] Paths:", Object.keys(spec.paths));
+  }
   
   return spec;
 };
