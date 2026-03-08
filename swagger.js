@@ -11,11 +11,11 @@ const options = {
     },
     servers: [
       {
-        url: process.env.BASE_URL || "http://localhost:5000"
+        url: process.env.BASE_URL || `http://localhost:${process.env.PORT || 5000}`
       }
     ]
   },
-  apis: [path.join(__dirname, "src/routes/*.js")]
+  apis: [path.join(__dirname, "src", "routes", "*.js")] // <--- separate folders with commas
 };
 
 module.exports = swaggerJsdoc(options);
