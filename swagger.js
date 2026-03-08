@@ -1,4 +1,5 @@
 const swaggerJsdoc = require("swagger-jsdoc");
+const path = require("path");
 
 const options = {
   definition: {
@@ -10,11 +11,11 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:5000"
+        url: process.env.BASE_URL || "http://localhost:5000"
       }
     ]
   },
-  apis: ["./src/routes/*.js"]
+  apis: [path.join(__dirname, "routes/*.js")]
 };
 
 module.exports = swaggerJsdoc(options);

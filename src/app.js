@@ -4,6 +4,7 @@ const routes = require("./routes/orderRoutes");
 
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("../swagger");
+require("dotenv").config();
 
 const app = express();
 
