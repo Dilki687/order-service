@@ -15,16 +15,38 @@ const controller = require("../controllers/orderController");
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - userId
+ *               - product
+ *               - quantity
+ *               - price
  *             properties:
- *               item:
+ *               userId:
+ *                 type: integer
+ *                 example: 1
+ *               product:
  *                 type: string
  *                 example: "Pizza"
  *               quantity:
  *                 type: integer
  *                 example: 2
+ *               price:
+ *                 type: number
+ *                 example: 19.99
+ *               status:
+ *                 type: string
+ *                 example: "pending"
  *     responses:
  *       201:
  *         description: Order created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   example: 1
  *       400:
  *         description: Invalid input
  */
@@ -48,11 +70,23 @@ router.post("/", controller.createOrder);
  *                 type: object
  *                 properties:
  *                   id:
+ *                     type: integer
+ *                     example: 1
+ *                   userId:
+ *                     type: integer
+ *                     example: 1
+ *                   product:
  *                     type: string
- *                   item:
- *                     type: string
+ *                     example: "Pizza"
  *                   quantity:
  *                     type: integer
+ *                     example: 2
+ *                   price:
+ *                     type: number
+ *                     example: 19.99
+ *                   status:
+ *                     type: string
+ *                     example: "pending"
  */
 router.get("/", controller.getOrders);
 
@@ -67,12 +101,35 @@ router.get("/", controller.getOrders);
  *       - in: path
  *         name: id
  *         schema:
- *           type: string
+ *           type: integer
  *         required: true
  *         description: The order ID
  *     responses:
  *       200:
  *         description: Order details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   example: 1
+ *                 userId:
+ *                   type: integer
+ *                   example: 1
+ *                 product:
+ *                   type: string
+ *                   example: "Pizza"
+ *                 quantity:
+ *                   type: integer
+ *                   example: 2
+ *                 price:
+ *                   type: number
+ *                   example: 19.99
+ *                 status:
+ *                   type: string
+ *                   example: "pending"
  *       404:
  *         description: Order not found
  */
@@ -89,12 +146,20 @@ router.get("/:id", controller.getOrder);
  *       - in: path
  *         name: id
  *         schema:
- *           type: string
+ *           type: integer
  *         required: true
  *         description: The order ID
  *     responses:
  *       200:
  *         description: Order deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Order deleted"
  *       404:
  *         description: Order not found
  */

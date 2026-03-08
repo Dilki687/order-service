@@ -15,7 +15,7 @@ const options = {
       }
     ]
   },
-  apis: [path.join(__dirname, "routes/*.js")]
+  apis: [path.join(__dirname, "src/routes/*.js")]
 };
 
 module.exports = swaggerJsdoc(options);
