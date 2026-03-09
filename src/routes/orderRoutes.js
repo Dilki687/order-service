@@ -57,6 +57,7 @@ const controller = require("../controllers/orderController");
  *       400:
  *         description: Menu items not available
  */
+router.post("/", controller.createOrder);
 
 /**
  * @swagger
