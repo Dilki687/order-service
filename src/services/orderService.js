@@ -1,24 +1,22 @@
 const orderModel = require("../models/orderModel");
 const menuService = require("./menuServiceClient");
+const paymentService = require("./paymentServiceClient");
 
 exports.createOrder = async (order, cb) => {
   try {
-    // Step 1: Validate menu items with Menu Service
+    // Step 1: Validate menu items
     const validation = await menuService.validateItems(order.items);
 
     console.log("Menu Service Response:", validation);
 
-    // If validation failed
     if (!validation.success) {
       return cb({ message: "Menu validation failed" });
     }
 
-    // If no items returned → item doesn't exist
     if (!validation.data || validation.data.length === 0) {
       return cb({ message: "Menu item does not exist" });
     }
 
-    // Check if any item unavailable
     const unavailableItem = validation.data.find(
       (item) => item.isAvailable === false,
     );
@@ -27,8 +25,31 @@ exports.createOrder = async (order, cb) => {
       return cb({ message: "Some menu items are unavailable" });
     }
 
-    // Step 2: Create order
-    orderModel.createOrder(order, cb);
+    // Step 2: Save order in DB
+    orderModel.createOrder(order, async (err, result) => {
+      if (err) return cb(err);
+
+      const orderId = result.id;
+
+      try {
+        // Step 3: Create payment
+        const payment = await paymentService.createPayment(
+          orderId,
+          order.userId,
+        );
+
+        cb(null, {
+          message: "Order created and payment initiated",
+          orderId: orderId,
+          payment: payment,
+        });
+      } catch (paymentError) {
+        cb({
+          message: "Order created but payment failed",
+          orderId: orderId,
+        });
+      }
+    });
   } catch (err) {
     cb({ message: err.message });
   }
