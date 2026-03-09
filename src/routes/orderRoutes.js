@@ -6,9 +6,14 @@ const controller = require("../controllers/orderController");
  * @swagger
  * /orders:
  *   post:
- *     summary: Create a new order
+ *     summary: Create a new order (validates items with Menu Service)
  *     tags:
  *       - Orders
+ *     description: |
+ *       This endpoint creates a new order.
+ *       Before creating the order, the Order Service calls the **Menu Service**
+ *       `/menu/validate` endpoint to verify that the requested menu items exist
+ *       and are available.
  *     requestBody:
  *       required: true
  *       content:
@@ -17,40 +22,41 @@ const controller = require("../controllers/orderController");
  *             type: object
  *             required:
  *               - userId
- *               - product
- *               - quantity
- *               - price
+ *               - items
  *             properties:
  *               userId:
  *                 type: integer
  *                 example: 1
  *               product:
  *                 type: string
- *                 example: "Pizza"
+ *                 example: "Chicken Burger"
  *               quantity:
  *                 type: integer
  *                 example: 2
  *               price:
  *                 type: number
- *                 example: 19.99
+ *                 example: 1200
  *               status:
  *                 type: string
  *                 example: "pending"
+ *               items:
+ *                 type: array
+ *                 description: Items validated by Menu Service
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     menuItemId:
+ *                       type: integer
+ *                       example: 1
+ *                     quantity:
+ *                       type: integer
+ *                       example: 2
  *     responses:
- *       201:
+ *       200:
  *         description: Order created successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: integer
- *                   example: 1
  *       400:
- *         description: Invalid input
+ *         description: Menu items not available
  */
-router.post("/", controller.createOrder);
 
 /**
  * @swagger
