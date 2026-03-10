@@ -21,10 +21,7 @@ const controller = require("../controllers/orderController");
  *       - Returns price and availability
  *       - POST /menu/validate
  *
- *       **Payment Service**
- *       - Automatically creates a Stripe payment for the order
- *       - POST https://food-order-payment-service-production.up.railway.app/api/payments/order/{orderId}/user/{userId}
- *       - Payment Service fetches order details and user info, creates Stripe PaymentIntent, and stores the payment record
+ *
  *
  *     requestBody:
  *       required: true
@@ -64,24 +61,12 @@ const controller = require("../controllers/orderController");
  *                       example: 2
  *     responses:
  *       200:
- *         description: Order created successfully and payment initiated
+ *         description: Order created successfully
  *         content:
  *           application/json:
  *             example:
  *               orderId: 2
- *               message: "Order created and payment initiated"
- *               payment:
- *                 success: true
- *                 message: "Payment created successfully from order"
- *                 data:
- *                   paymentId: "69afd2f634a8879494c24cc1"
- *                   orderId: "2"
- *                   userId: "u2"
- *                   amount: 2400
- *                   currency: "usd"
- *                   status: "processing"
- *                   stripePaymentIntentId: "pi_3T9LRC2XiQfMIAie01Nwc5NX"
- *                   clientSecret: "pi_3T9LRC2XiQfMIAie01Nwc5NX_secret_dDQNN2laaVJ3DN8XzjDQhProw"
+ *               message: "Order created successfully"
  */
 router.post("/", controller.createOrder);
 
@@ -139,7 +124,7 @@ router.get("/", controller.getOrders);
  *         description: The order ID
  *     responses:
  *       200:
- *         description: Order details formatted for Payment Service
+ *         description: Order details
  *         content:
  *           application/json:
  *             schema:

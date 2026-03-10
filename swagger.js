@@ -28,7 +28,6 @@ module.exports = () => {
           "Order Microservice API for the Food Ordering System. Handles order creation and integrates with external microservices:\n\n" +
           "• User Identity Service → validates customer accounts\n\n" +
           "• Menu Service → validates menu items and pricing\n\n" +
-          "• Payment Service → automatically creates a Stripe payment after order creation\n\n" +
           "This service demonstrates distributed microservice communication.",
       },
       servers: [

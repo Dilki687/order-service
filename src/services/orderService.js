@@ -1,7 +1,6 @@
 const orderModel = require("../models/orderModel");
 const menuService = require("./menuServiceClient");
 const userService = require("./userServiceClient");
-const paymentService = require("./paymentServiceClient");
 
 exports.createOrder = async (order, cb) => {
   try {
@@ -41,11 +40,10 @@ exports.createOrder = async (order, cb) => {
       0
     );
 
-    // store total amount
     order.price = totalAmount;
 
     // STEP 4️⃣ Save Order
-    orderModel.createOrder(order, async (err, result) => {
+    orderModel.createOrder(order, (err, result) => {
       if (err) {
         return cb(err);
       }
@@ -54,31 +52,10 @@ exports.createOrder = async (order, cb) => {
 
       console.log("Order created with ID:", orderId);
 
-      try {
-        // STEP 5️⃣ Call Payment Service
-        const payment = await paymentService.createPaymentForOrder(
-          orderId,
-          order.userId
-        );
-
-        console.log("Payment created:", payment);
-
-        cb(null, {
-          orderId,
-          message: "Order created and payment initiated",
-          payment,
-        });
-
-      } catch (paymentError) {
-
-        console.error("Payment creation failed:", paymentError.message);
-
-        cb(null, {
-          orderId,
-          message: "Order created but payment failed",
-        });
-
-      }
+      cb(null, {
+        orderId,
+        message: "Order created successfully",
+      });
     });
 
   } catch (err) {
@@ -97,18 +74,13 @@ exports.getOrderById = (id, cb) => {
     if (err) return cb(err);
     if (!row) return cb({ message: "Order not found" });
 
-    // Format expected by Payment Service
     const formattedOrder = {
-      _id: String(row.id),
+      id: row.id,
       userId: row.userId,
+      product: row.product,
+      quantity: row.quantity,
+      price: row.price,
       status: row.status,
-      totalAmount: row.price,
-      items: [
-        {
-          menuItemId: 1,
-          quantity: row.quantity,
-        },
-      ],
     };
 
     cb(null, formattedOrder);
