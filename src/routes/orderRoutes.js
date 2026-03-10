@@ -10,16 +10,22 @@ const controller = require("../controllers/orderController");
  *     tags:
  *       - Orders
  *     description: |
- *       This endpoint creates a new order.
- *       
- *       **Inter-service communication occurs here:**
- *       1. The Order Service calls the **User Service** to validate that the user exists.
- *          GET https://user-identity-service.onrender.com/api/users/{id}
- *       
- *       2. The Order Service calls the **Menu Service** to validate menu items.
- *          POST /menu/validate
- *       
- *       Only if both validations succeed will the order be stored in the Order Service database.
+ *       This endpoint creates a new order and triggers inter-service communication:
+ *
+ *       **User Identity Service**
+ *       - Validates the user exists
+ *       - GET https://user-identity-service.onrender.com/api/users/{userId}
+ *
+ *       **Menu Service**
+ *       - Validates requested menu items
+ *       - Returns price and availability
+ *       - POST /menu/validate
+ *
+ *       **Payment Service**
+ *       - Automatically creates a Stripe payment for the order
+ *       - POST https://food-order-payment-service-production.up.railway.app/api/payments/order/{orderId}/user/{userId}
+ *       - Payment Service fetches order details and user info, creates Stripe PaymentIntent, and stores the payment record
+ *
  *     requestBody:
  *       required: true
  *       content:
@@ -32,10 +38,10 @@ const controller = require("../controllers/orderController");
  *             properties:
  *               userId:
  *                 type: string
- *                 example: "user123"
+ *                 example: "u2"
  *               product:
  *                 type: string
- *                 example: "Chicken Burger"
+ *                 example: "burger"
  *               quantity:
  *                 type: integer
  *                 example: 2
@@ -47,7 +53,6 @@ const controller = require("../controllers/orderController");
  *                 example: "pending"
  *               items:
  *                 type: array
- *                 description: Items validated by Menu Service
  *                 items:
  *                   type: object
  *                   properties:
@@ -59,9 +64,24 @@ const controller = require("../controllers/orderController");
  *                       example: 2
  *     responses:
  *       200:
- *         description: Order created successfully
- *       400:
- *         description: Validation failed (User or Menu)
+ *         description: Order created successfully and payment initiated
+ *         content:
+ *           application/json:
+ *             example:
+ *               orderId: 2
+ *               message: "Order created and payment initiated"
+ *               payment:
+ *                 success: true
+ *                 message: "Payment created successfully from order"
+ *                 data:
+ *                   paymentId: "69afd2f634a8879494c24cc1"
+ *                   orderId: "2"
+ *                   userId: "u2"
+ *                   amount: 2400
+ *                   currency: "usd"
+ *                   status: "processing"
+ *                   stripePaymentIntentId: "pi_3T9LRC2XiQfMIAie01Nwc5NX"
+ *                   clientSecret: "pi_3T9LRC2XiQfMIAie01Nwc5NX_secret_dDQNN2laaVJ3DN8XzjDQhProw"
  */
 router.post("/", controller.createOrder);
 
@@ -119,30 +139,35 @@ router.get("/", controller.getOrders);
  *         description: The order ID
  *     responses:
  *       200:
- *         description: Order details
+ *         description: Order details formatted for Payment Service
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 id:
- *                   type: integer
- *                   example: 1
- *                 userId:
- *                   type: integer
- *                   example: 1
- *                 product:
+ *                 _id:
  *                   type: string
- *                   example: "Pizza"
- *                 quantity:
- *                   type: integer
- *                   example: 2
- *                 price:
- *                   type: number
- *                   example: 19.99
+ *                   example: "2"
+ *                 userId:
+ *                   type: string
+ *                   example: "u2"
  *                 status:
  *                   type: string
  *                   example: "pending"
+ *                 totalAmount:
+ *                   type: number
+ *                   example: 2400
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       menuItemId:
+ *                         type: integer
+ *                         example: 1
+ *                       quantity:
+ *                         type: integer
+ *                         example: 2
  *       404:
  *         description: Order not found
  */
