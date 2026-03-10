@@ -6,14 +6,20 @@ const controller = require("../controllers/orderController");
  * @swagger
  * /orders:
  *   post:
- *     summary: Create a new order (validates items with Menu Service)
+ *     summary: Create a new order
  *     tags:
  *       - Orders
  *     description: |
  *       This endpoint creates a new order.
- *       Before creating the order, the Order Service calls the **Menu Service**
- *       `/menu/validate` endpoint to verify that the requested menu items exist
- *       and are available.
+ *       
+ *       **Inter-service communication occurs here:**
+ *       1. The Order Service calls the **User Service** to validate that the user exists.
+ *          GET https://user-identity-service.onrender.com/api/users/{id}
+ *       
+ *       2. The Order Service calls the **Menu Service** to validate menu items.
+ *          POST /menu/validate
+ *       
+ *       Only if both validations succeed will the order be stored in the Order Service database.
  *     requestBody:
  *       required: true
  *       content:
@@ -25,8 +31,8 @@ const controller = require("../controllers/orderController");
  *               - items
  *             properties:
  *               userId:
- *                 type: integer
- *                 example: 1
+ *                 type: string
+ *                 example: "user123"
  *               product:
  *                 type: string
  *                 example: "Chicken Burger"
@@ -55,7 +61,7 @@ const controller = require("../controllers/orderController");
  *       200:
  *         description: Order created successfully
  *       400:
- *         description: Menu items not available
+ *         description: Validation failed (User or Menu)
  */
 router.post("/", controller.createOrder);
 
@@ -80,8 +86,8 @@ router.post("/", controller.createOrder);
  *                     type: integer
  *                     example: 1
  *                   userId:
- *                     type: integer
- *                     example: 1
+ *                     type: string
+ *                     example: "user123"
  *                   product:
  *                     type: string
  *                     example: "Pizza"

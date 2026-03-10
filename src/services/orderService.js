@@ -1,24 +1,31 @@
 const orderModel = require("../models/orderModel");
 const menuService = require("./menuServiceClient");
+const userService = require("./userServiceClient");
 
 exports.createOrder = async (order, cb) => {
   try {
-    // Step 1: Validate menu items with Menu Service
+    // STEP 1️⃣ Validate USER with User Service
+    const user = await userService.validateUser(order.userId);
+
+    if (!user) {
+      return cb({ message: "User does not exist" });
+    }
+
+    console.log("User validated:", user);
+
+    // STEP 2️⃣ Validate menu items
     const validation = await menuService.validateItems(order.items);
 
     console.log("Menu Service Response:", validation);
 
-    // If validation failed
     if (!validation.success) {
       return cb({ message: "Menu validation failed" });
     }
 
-    // If no items returned → item doesn't exist
     if (!validation.data || validation.data.length === 0) {
       return cb({ message: "Menu item does not exist" });
     }
 
-    // Check if any item unavailable
     const unavailableItem = validation.data.find(
       (item) => item.isAvailable === false,
     );
@@ -27,7 +34,7 @@ exports.createOrder = async (order, cb) => {
       return cb({ message: "Some menu items are unavailable" });
     }
 
-    // Step 2: Create order
+    // STEP 3️⃣ Create Order
     orderModel.createOrder(order, cb);
   } catch (err) {
     cb({ message: err.message });

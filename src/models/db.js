@@ -12,7 +12,7 @@ const db = new sqlite3.Database("./orders.db", (err) => {
 db.run(`
 CREATE TABLE IF NOT EXISTS orders (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  userId INTEGER,
+  userId TEXT,
   product TEXT,
   quantity INTEGER,
   price REAL,

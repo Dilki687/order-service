@@ -24,7 +24,7 @@ module.exports = () => {
       info: {
         title: "Order Service API",
         version: "1.0.0",
-        description: "Order Microservice API",
+        description: "Order Microservice API with User Service and Menu Service integration",
       },
       servers: [
         {
