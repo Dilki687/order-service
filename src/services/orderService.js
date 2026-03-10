@@ -28,15 +28,23 @@ exports.createOrder = async (order, cb) => {
     }
 
     const unavailableItem = validation.data.find(
-      (item) => item.isAvailable === false,
+      (item) => item.isAvailable === false
     );
 
     if (unavailableItem) {
       return cb({ message: "Some menu items are unavailable" });
     }
 
-    // STEP 3️⃣ Create Order
-    // STEP 3️⃣ Create Order
+    // STEP 3️⃣ Calculate total price
+    const totalAmount = validation.data.reduce(
+      (sum, item) => sum + item.currentPrice * item.quantity,
+      0
+    );
+
+    // store total amount
+    order.price = totalAmount;
+
+    // STEP 4️⃣ Save Order
     orderModel.createOrder(order, async (err, result) => {
       if (err) {
         return cb(err);
@@ -47,10 +55,10 @@ exports.createOrder = async (order, cb) => {
       console.log("Order created with ID:", orderId);
 
       try {
-        // STEP 4️⃣ Call Payment Service
+        // STEP 5️⃣ Call Payment Service
         const payment = await paymentService.createPaymentForOrder(
           orderId,
-          order.userId,
+          order.userId
         );
 
         console.log("Payment created:", payment);
@@ -60,15 +68,19 @@ exports.createOrder = async (order, cb) => {
           message: "Order created and payment initiated",
           payment,
         });
+
       } catch (paymentError) {
+
         console.error("Payment creation failed:", paymentError.message);
 
         cb(null, {
           orderId,
           message: "Order created but payment failed",
         });
+
       }
     });
+
   } catch (err) {
     cb({ message: err.message });
   }
@@ -79,7 +91,28 @@ exports.getOrders = (cb) => {
 };
 
 exports.getOrderById = (id, cb) => {
-  orderModel.getOrderById(id, cb);
+
+  orderModel.getOrderById(id, (err, row) => {
+
+    if (err) return cb(err);
+    if (!row) return cb({ message: "Order not found" });
+
+    // Format expected by Payment Service
+    const formattedOrder = {
+      _id: String(row.id),
+      userId: row.userId,
+      status: row.status,
+      totalAmount: row.price,
+      items: [
+        {
+          menuItemId: 1,
+          quantity: row.quantity,
+        },
+      ],
+    };
+
+    cb(null, formattedOrder);
+  });
 };
 
 exports.deleteOrder = (id, cb) => {

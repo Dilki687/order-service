@@ -17,6 +17,8 @@ exports.getOrders = (req, res) => {
 exports.getOrder = (req, res) => {
   orderService.getOrderById(req.params.id, (err, row) => {
     if (err) return res.status(500).json(err);
+    if (!row) return res.status(404).json({ message: "Order not found" });
+
     res.json(row);
   });
 };
