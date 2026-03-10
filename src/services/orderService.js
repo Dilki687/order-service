@@ -1,6 +1,7 @@
 const orderModel = require("../models/orderModel");
 const menuService = require("./menuServiceClient");
 const userService = require("./userServiceClient");
+const paymentService = require("./paymentServiceClient");
 
 exports.createOrder = async (order, cb) => {
   try {
@@ -35,7 +36,39 @@ exports.createOrder = async (order, cb) => {
     }
 
     // STEP 3️⃣ Create Order
-    orderModel.createOrder(order, cb);
+    // STEP 3️⃣ Create Order
+    orderModel.createOrder(order, async (err, result) => {
+      if (err) {
+        return cb(err);
+      }
+
+      const orderId = result.id;
+
+      console.log("Order created with ID:", orderId);
+
+      try {
+        // STEP 4️⃣ Call Payment Service
+        const payment = await paymentService.createPaymentForOrder(
+          orderId,
+          order.userId,
+        );
+
+        console.log("Payment created:", payment);
+
+        cb(null, {
+          orderId,
+          message: "Order created and payment initiated",
+          payment,
+        });
+      } catch (paymentError) {
+        console.error("Payment creation failed:", paymentError.message);
+
+        cb(null, {
+          orderId,
+          message: "Order created but payment failed",
+        });
+      }
+    });
   } catch (err) {
     cb({ message: err.message });
   }
