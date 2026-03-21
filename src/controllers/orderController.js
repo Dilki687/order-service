@@ -1,6 +1,12 @@
 const orderService = require("../services/orderService");
 
 exports.createOrder = (req, res) => {
+  const { userId, items, status } = req.body;
+
+  if (!userId || !Array.isArray(items) || items.length === 0) {
+    return res.status(400).json({ message: "userId and items are required" });
+  }
+
   orderService.createOrder(req.body, (err, data) => {
     if (err) return res.status(500).json(err);
     res.json(data);

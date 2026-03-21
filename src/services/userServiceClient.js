@@ -1,19 +1,11 @@
 const axios = require("axios");
 
-const USER_SERVICE_URL = "https://user-identity-service.onrender.com";
+const USER_SERVICE_URL = process.env.USER_SERVICE_URL;
 
 exports.validateUser = async (userId) => {
   try {
-    console.log("Calling User Service with ID:", userId);
-
-    const response = await axios.get(
-      `${USER_SERVICE_URL}/api/users/${userId}`
-    );
-
-    console.log("User Service Response:", response.data);
-
+    const response = await axios.get(`${USER_SERVICE_URL}/api/users/${userId}`);
     return response.data;
-
   } catch (error) {
     console.error("User service validation error:", error.message);
 
