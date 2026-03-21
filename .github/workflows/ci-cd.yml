@@ -31,7 +31,7 @@ jobs:
         run: npm audit --audit-level=high || echo "npm audit found issues"
 
       - name: SonarQube Cloud Scan
-        uses: SonarSource/sonarqube-scan-action@v5
+        uses: SonarSource/sonarqube-scan-action@v7
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
