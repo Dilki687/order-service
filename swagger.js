@@ -38,7 +38,7 @@ module.exports = () => {
         },
       ],
     },
-    // Use __dirname for reliable path resolution (works on Railway too)
+    // Use __dirname for reliable path resolution (works on Railway too)..
     apis: [apisPath],
   };
 
