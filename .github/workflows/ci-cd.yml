@@ -30,9 +30,11 @@ jobs:
       - name: Run npm audit
         run: npm audit --audit-level=high || echo "npm audit found issues"
 
+      - name: Run tests with coverage
+        run: npm test -- --coverage
+
       - name: SonarQube Cloud Scan
         uses: SonarSource/sonarqube-scan-action@v7
-        continue-on-error: true
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
